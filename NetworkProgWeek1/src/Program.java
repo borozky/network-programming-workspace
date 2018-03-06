@@ -17,18 +17,17 @@ public class Program {
 	 */
 	public static void task1(){
 		
-		InputStream input = null;
-		OutputStream output = null;
+		System.out.print("Enter your input: ");
 		
-		try {
-			input = new BufferedInputStream(System.in);
-			output = new BufferedOutputStream(System.out);
-			
+		try (
+			InputStream input = new BufferedInputStream(System.in);
+			OutputStream output = new BufferedOutputStream(System.out);
+		) {
 			
 			int data = input.read();
 			while(data != -1) {
 				char character = (char) data;
-				if (Character.isWhitespace(character)) {
+				if (character == ' ') {
 					character = '_';
 				}
 				
@@ -39,20 +38,10 @@ public class Program {
 				// read next character
 				data = input.read();
 			}
-			
-			
-		} catch(IOException e) {
-			e.printStackTrace();
-		} 
+		}
 		
-		// close connection; check for nulls
-		finally {
-			try {
-				if (input != null) input.close();
-				if (output != null) output.close();
-			} catch(IOException ex) {
-				ex.printStackTrace();
-			}
+		catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 	}
@@ -66,42 +55,48 @@ public class Program {
 	 */
 	public static void task2A() {
 		
-		InputStream input = null;
-		OutputStream output = null;
-		CheckedOutputStream checkedOutput = null;
+		File outputFile = new File("output.txt");
+		File checksumFile = new File("checksum.txt");
 		
-		try {
-			input = new BufferedInputStream(System.in);
-			output = new BufferedOutputStream(System.out);
-			checkedOutput = new CheckedOutputStream(System.out, new CRC32());
+		System.out.print("Enter your input: ");
+		
+		try (
+			InputStream input = new BufferedInputStream(System.in);
+			OutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile));
+			OutputStream checksumOutput = new BufferedOutputStream(new FileOutputStream(checksumFile));
+			CheckedOutputStream checkedOutput = new CheckedOutputStream(output, new CRC32());
+		) {
 			
 			int data = input.read();
-			int available = input.available();
-			byte[] bytes = new byte[available];
-			
 			while(data != -1) {
+				if ((char) data == 'x') {
+					break;
+				}
+				checkedOutput.write(data);
+				checkedOutput.flush();
 				
+				if (input.available() == 0) {
+					String checksumString = Long.toString(checkedOutput.getChecksum().getValue());
+					checksumOutput.write(checksumString.getBytes());
+					checksumOutput.flush();
+					
+					System.out.printf("Output sent to %s. Checksum version sent to %s.", outputFile.getName(), checksumFile.getName());
+				}
+				
+				data = input.read();
 			}
 			
+			System.out.println("Checksum: " + checkedOutput.getChecksum().getValue());
 			
 			
-		} catch(IOException e) {
+		} 
+		catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (input != null) input.close();
-				if (output != null) output.close();
-				if (checkedOutput != null) checkedOutput.close();
-			} catch(IOException ex) {
-				ex.printStackTrace();
-			}
 		}
-		
-		
 		
 	}
 	
-	public static void task2B() {
+	public static void task2B () {
 		
 	}
 
