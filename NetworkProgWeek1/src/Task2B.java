@@ -23,15 +23,17 @@ public class Task2B {
 			CheckedOutputStream checkedOutputStream = new CheckedOutputStream(output, new CRC32());
 		) {
 			
+			// use checkedOutputStream to print data from file to 
+			// the console and calculate the checksum at the same time
 			int data = fileInput.read();
 			while (data != -1) {
 				checkedOutputStream.write(data);
 				data = fileInput.read();
 			}
 			
+			// Print the checksum
 			Long checksum = checkedOutputStream.getChecksum().getValue();
 			System.out.println("Checksum: " + Long.toString(checksum));
-			
 			
 			
 		} catch (FileNotFoundException e) {

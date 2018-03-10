@@ -22,9 +22,10 @@ public class Task1 {
 					character = '_';
 				}
 				
-				// output
-				output.write(character);
-				output.flush(); // Important! Without this, the text won't be printed on the screen
+				// write() only stores data in the buffer
+				// flush() is the method that pushes the data from buffer to the console
+				output.write(character); 
+				output.flush();
 				
 				// read next character
 				data = input.read();
