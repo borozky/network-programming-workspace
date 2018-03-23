@@ -32,17 +32,22 @@ public class Client {
 		BufferedReader consoleInput = null;
 		
 		try {
-			
 			// connect to server
 			socket = new Socket(address, port);
+			String localSocketAddress = socket.getLocalAddress().getHostAddress();
+			int localPortNumber = socket.getLocalPort();
+			System.out.printf("Client %s:%d successfully launched\n", localSocketAddress, localPortNumber);
 			System.out.println("Connected to " + address + " on port " + port);
+			
 			
 			// setup input and output streams
 			output = new PrintWriter(socket.getOutputStream(), true);
 			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			consoleInput = new BufferedReader(new InputStreamReader(System.in));
 			
+			
 			printInstructions();
+			
 			
 			// Read line from console. On enter pressed, this client sends the message to the server
 			// This client expects replies from server. 
