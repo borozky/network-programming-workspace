@@ -1,6 +1,5 @@
 package networkinterface;
 
-import java.io.*;
 import java.net.*;
 import java.util.*;
 import static java.lang.System.out;
