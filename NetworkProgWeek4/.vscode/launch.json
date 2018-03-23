@@ -1,0 +1,48 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Client<NetworkProgWeek4>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopOnEntry": false,
+            "mainClass": "echoserver.Client",
+            "projectName": "NetworkProgWeek4",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Server<NetworkProgWeek4>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopOnEntry": false,
+            "mainClass": "echoserver.Server",
+            "projectName": "NetworkProgWeek4",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-ListNIFs<NetworkProgWeek4>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopOnEntry": false,
+            "mainClass": "networkinterface.ListNIFs",
+            "projectName": "NetworkProgWeek4",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Attach)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 0
+        }
+    ]
+}
