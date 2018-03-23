@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 
 /**
@@ -18,6 +22,39 @@ public class Server {
 	
 	
 	public static final int DEFAULT_PORT_NUMBER = 15376;
+	public static final String LOG_FILE = "echoserver.log";
+	public static Logger logger;
+	
+	
+	/**
+	 * Set up logging. New logs are appended. 
+	 * If log file doesn't exist, it is automatically created
+	 */
+	static {
+		logger = Logger.getLogger(Server.class.getName());
+		
+		// Disable default console logging
+		logger.setUseParentHandlers(false);
+		
+		FileHandler fileHandler = null;
+		
+		try {
+			// handle logging through files. 'true' means append to existing log file
+			fileHandler = new FileHandler(LOG_FILE, true);
+			fileHandler.setLevel(Level.INFO);
+			
+			// use SimpleFormatter instead of default XMLFormatter
+			fileHandler.setFormatter(new SimpleFormatter()); 
+			
+			logger.addHandler(fileHandler);
+		} 
+		catch (SecurityException e) {
+			logger.log(Level.SEVERE, "Logger is not working. ", e.getMessage());
+		}
+		catch (IOException e) {
+			logger.log(Level.SEVERE, "Logger is not working. ", e.getMessage());
+		}
+	}
 	
 	
 	public static void main(String[] args) {
@@ -40,17 +77,23 @@ public class Server {
 			do {
 				// accept client
 				clientSocket = serverSocket.accept();
-				clientConnected();
+				clientConnected(clientSocket);
 				
 				// accept input
 				out = new PrintWriter(clientSocket.getOutputStream(), true); // true: auto-flush
 				input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				
-				// print response
+				// Print client message, then reply back
 				String line;
 				while ((line = input.readLine()) != null) {
-					System.out.println("Client: " + line);
-					out.println(line);
+					
+					// log message
+					printClientMessage(line);
+					log(line);
+					
+					// reply back the client's message as upper-case letters
+					String response = line.toUpperCase();
+					out.println(response);
 				}
 				
 				clientDisconnected();
@@ -83,6 +126,11 @@ public class Server {
 	}
 	
 	
+	public static void printClientMessage(String line) {
+		System.out.println("Client: " + line);
+	}
+
+
 	/**
 	 * Get the port number provided by command line arguments
 	 * 
@@ -110,13 +158,14 @@ public class Server {
 	/**
 	 * Simple callback saying the client is connected
 	 */
-	public static void clientConnected() {
-		System.out.println();
-		System.out.println("+-----------------------------+");
-		System.out.println("|       Client connected      |");
-		System.out.println("+-----------------------------+");
+	public static void clientConnected(Socket socket) {
+		String peerHostAddress = "[unknown peer address]";
+		InetAddress inetAddress = socket.getInetAddress();
+		if (inetAddress != null) {
+			peerHostAddress = inetAddress.getHostAddress();
+		}
+		System.out.printf("********CLIENT %s CONNECTED *********\n", peerHostAddress);
 		System.out.println("Waiting for input...");
-		
 	}
 	
 	
@@ -138,6 +187,16 @@ public class Server {
 	 */
 	public static void waitingForConnection(int port) {
 		System.out.println("Listening on port " + port + "...");
+	}
+	
+	
+	/**
+	 * Log message to the a file
+	 * 
+	 * @param message
+	 */
+	public static void log(String message) {
+		logger.info(message);
 	}
 
 }
