@@ -27,6 +27,7 @@ import java.util.zip.CheckedOutputStream;
  */
 public class Client {
 	
+	public static final int CHECKSUM_PORT_NUMBER = 25376;
 	public static final int DEFAULT_PORT_NUMBER = 15376;
 	public static final String DEFAULT_HOST = "127.0.0.1";
 
@@ -177,7 +178,7 @@ public class Client {
 	 * @return int
 	 */
 	public static int getPortNumberForChecksums(String[] args) {
-		int portNumberForChecksums = Server.CHECKSUM_PORT_NUMBER;
+		int portNumberForChecksums = CHECKSUM_PORT_NUMBER;
 
 		if (args.length < 3) {
 			return portNumberForChecksums;
