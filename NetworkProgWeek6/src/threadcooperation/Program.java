@@ -1,4 +1,4 @@
-package task2;
+package threadcooperation;
 
 import java.util.Scanner;
 
@@ -20,14 +20,14 @@ class PrinterThread implements Runnable {
 					InputThread.LOCK.wait();
 				}
 				
-				// Task2.line will be modified by thread 'INPUT'
-				// after INPUT thread calls 'notifyAll()', this line will execute
+				// InputThread.line will be modified by thread 'INPUT THREAD'
+				// after INPUT THREAD calls 'notifyAll()', this line will execute
 				System.out.printf("[%s] %s\n", threadName, InputThread.line);
 				
 			} 
 			
 			// This is just in case another thread interrupts this thread
-			// This will just print Task2.line's current value
+			// This will just print InputThread.line's current value
 			catch (InterruptedException e) {
 				System.err.printf("[%s] %s\n", threadName, InputThread.line);
 			}
@@ -56,7 +56,7 @@ class InputThread implements Runnable {
 		Scanner scanner = new Scanner(System.in);
 		
 		// never use synchronized block here
-		// else the 'PRINTER' thread will stuck waiting forever
+		// else the 'PRINTER THREAD' will be stuck waiting forever
 		
 		do {
 			

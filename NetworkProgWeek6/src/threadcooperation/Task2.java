@@ -1,4 +1,4 @@
-package task2;
+package threadcooperation;
 
 import java.util.Scanner;
 
