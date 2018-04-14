@@ -2,6 +2,13 @@ package threadbasics;
 
 import java.util.Scanner;
 
+/**
+ * Server thread checks for inputs from the console. 
+ * The input is saved in a 'volatile' variable. 
+ * If input is a single character 'x', this thread exits.
+ * 
+ * @author Joshua Orozco
+ */
 public class ServerThread implements Runnable {
 
 	@Override
@@ -36,6 +43,14 @@ public class ServerThread implements Runnable {
 	// prevents thread caching this variable
 	static volatile String message;
 	
+	
+	/**
+	 * Main thread runs here
+	 * The job of main thread is to print the 'volatile' message variable.
+	 * If 'message' is a single character 'x', thread exits.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		
 		// Start the server.
@@ -55,7 +70,7 @@ public class ServerThread implements Runnable {
 			// print to console if message has been changed
 			System.out.println("[MAIN] " + message);
 			
-			// prevents console from print too many times
+			// prevents console from printing too many times
 			message = null;
 		}
 		

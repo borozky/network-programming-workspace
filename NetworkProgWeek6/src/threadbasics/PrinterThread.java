@@ -2,6 +2,12 @@ package threadbasics;
 
 import java.util.Scanner;
 
+/**
+ * Printer thread prints the volatile 'message'
+ * variable from the console, then exits immediately.
+ * 
+ * @author user
+ */
 public class PrinterThread implements Runnable {
 	
 	// message will be changed by main thread, so use volatile
@@ -22,6 +28,14 @@ public class PrinterThread implements Runnable {
 		this.message = message;
 	}
 	
+	/**
+	 * Main thread scans inputs and modifies 
+	 * 'message' field from the PrinterThread 
+	 * object. After that, the main thread 
+	 * exits immediately.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		
 		// run the thread

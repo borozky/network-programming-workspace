@@ -2,7 +2,7 @@ package threadcooperation;
 
 import java.util.Scanner;
 
-public class Task2 {
+public class Playground {
 	
 	public static String line = "";
 	static final Object LOCK = new Object();
@@ -19,25 +19,25 @@ public class Task2 {
 					
 					// let's wait for the object called 'LOCK' to 
 					// release monitor lock
-					synchronized(Task2.LOCK) {
-						Task2.LOCK.wait();
+					synchronized(Playground.LOCK) {
+						Playground.LOCK.wait();
 					}
 					
 					// Task2.line will be modified by thread 'INPUT'
 					// after INPUT thread calls 'notifyAll()', this line will execute
-					System.out.println("[PRINTER] " + Task2.line);
+					System.out.println("[PRINTER] " + Playground.line);
 					
 				} 
 				
 				// This is just in case another thread interrupts this thread
 				// This will just print Task2.line's current value
 				catch (InterruptedException e) {
-					System.err.println("[PRINTER] " + Task2.line);
+					System.err.println("[PRINTER] " + Playground.line);
 				}
 				
 			} 
 			// Exit when line is 'x'
-			while (Task2.line.equals("x") == false);
+			while (Playground.line.equals("x") == false);
 			
 			System.out.println(Thread.currentThread().getName() + " closed.");
 			return;
@@ -58,12 +58,12 @@ public class Task2 {
 				// by then, this thread notifies other thread waiting for Task2.LOCK
 				synchronized (LOCK) {
 					System.out.print("[INPUT] Enter your input: ");
-					Task2.line = scanner.nextLine();
-					Task2.LOCK.notifyAll();
+					Playground.line = scanner.nextLine();
+					Playground.LOCK.notifyAll();
 				}
 				
 				// checks if line is not "x" or line is empty (line with spaces only is NOT empty)
-				if (Task2.line.equals("x") == false || Task2.line.isEmpty()) {
+				if (Playground.line.equals("x") == false || Playground.line.isEmpty()) {
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
