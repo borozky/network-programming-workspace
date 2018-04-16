@@ -42,7 +42,7 @@ public class PrinterThread implements Runnable {
 			
 		} 
 		// Exit when line is 'x'
-		while (InputThread.line.equals("x") == false);
+		while (InputThread.line.toLowerCase().equals("x") == false);
 		
 		System.out.println(threadName + " closed.");
 		return;
