@@ -11,7 +11,7 @@ import java.util.jar.JarFile;
 
 public class Program {
 	
-	public static final String JAR_URL_ADDRESS = "http://m1-c45n1.csit.rmit.edu.au//~Course/HelloWorld.jar";
+	public static final String JAR_URL_ADDRESS = "jar:http://m1-c45n1.csit.rmit.edu.au//~Course/HelloWorld.jar!/";
 
 	public static void main(String[] args) {
 		
@@ -25,11 +25,11 @@ public class Program {
 			
 			// content type
 			String contentType = jarURLConnection.getContentType();
-			System.out.printf("CONTENT-TYPE: %s\n" + contentType);
+			System.out.printf("CONTENT-TYPE: %s\n", contentType);
 			
 			// content length
 			int contentLength = jarURLConnection.getContentLength();
-			System.out.printf("CONTENT-LENGTH: %d\n" + contentLength);
+			System.out.printf("CONTENT-LENGTH: %d\n", contentLength);
 			
 			// get entries
 			jarFile = jarURLConnection.getJarFile();
