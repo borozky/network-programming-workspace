@@ -40,7 +40,7 @@ public class Program {
 				JarEntry entry = jarEntries.nextElement();
 				String entryName = entry.getName();
 				long entrySize = entry.getSize();
-				System.out.printf("%s (%l bytes)\n", entryName, entrySize);
+				System.out.printf("%s (%d bytes)\n", entryName, entrySize);
 			}
 		}
 		catch (UnknownHostException e) {
