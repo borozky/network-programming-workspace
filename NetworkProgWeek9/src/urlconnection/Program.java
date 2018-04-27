@@ -1,20 +1,21 @@
 package urlconnection;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 
+/**
+ * Program that prints the type, length and contents of a URL resource. 
+ * <p>Note: In order to access the URL resource, you should run 
+ * this program inside the moonshot server. 
+ */
 public class Program {
 	
 	public static final String URL_ADDRESS = "http://m1-c45n1.csit.rmit.edu.au/~Course/index.php";
-	public static final String RMIT_ADDRESS = "https://rmit.edu.au";
 
 	public static void main(String[] args) {
 		

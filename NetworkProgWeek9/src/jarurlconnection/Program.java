@@ -9,6 +9,13 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * Class that connects to a jar resource and prints
+ * its content type and length, along with the jar files entries.
+ * <p>It will connect to this resource: http://m1-c45n1.csit.rmit.edu.au//~Course/HelloWorld.jar
+ * <p>Note: This program should run inside the 
+ * moonshot server so that it can access the resource.
+ */
 public class Program {
 	
 	public static final String JAR_URL_ADDRESS = "jar:http://m1-c45n1.csit.rmit.edu.au//~Course/HelloWorld.jar!/";
