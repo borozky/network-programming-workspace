@@ -57,7 +57,7 @@ public class Program {
 			System.err.println("Invalid url. " + e.getMessage());
 		}
 		catch (IOException e) {
-			System.err.println(e.getMessage());
+			System.err.println("Sorry, something went wrong. " + e.getMessage());
 		}
 		finally {
 			

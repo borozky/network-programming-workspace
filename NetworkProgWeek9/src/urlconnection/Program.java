@@ -71,8 +71,7 @@ public class Program {
 			System.err.println("URL is invalid. " + e.getMessage());
 		} 
 		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("Sorry, something went wrong. " + e.getMessage());
 		}
 		finally {
 			try {
