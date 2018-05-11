@@ -39,7 +39,7 @@ public class InputThread implements Runnable {
 			} // monitor lock released here in the ending curly brace '}'
 			
 			// checks if line is not "x" or line is empty (line with spaces only is NOT empty)
-			if (line.equals("x") == false || line.isEmpty()) {
+			if (line.toLowerCase().equals("x") == false || line.isEmpty()) {
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
@@ -48,7 +48,7 @@ public class InputThread implements Runnable {
 			}
 			
 		} 
-		while (line.equals("x") == false);
+		while (line.toLowerCase().equals("x") == false);
 		
 		// EXIT thread 'INPUT'
 		scanner.close();
