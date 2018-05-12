@@ -114,7 +114,7 @@ public class Server {
 					
 				}	
 				catch (IOException e) {
-					e.printStackTrace();
+					System.err.println("Sorry. client has forcibly closed the connection. Message: " + e.getMessage());
 				}
 				finally {
 					try {
