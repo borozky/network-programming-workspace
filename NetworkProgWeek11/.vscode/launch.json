@@ -29,6 +29,38 @@
         },
         {
             "type": "java",
+            "name": "Debug (Launch)-NonBlockingClient<NetworkProgWeek11>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopOnEntry": false,
+            "mainClass": "task2.client.NonBlockingClient",
+            "projectName": "NetworkProgWeek11",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-NonBlockingServer<NetworkProgWeek11>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopOnEntry": false,
+            "mainClass": "task2.server.NonBlockingServer",
+            "projectName": "NetworkProgWeek11",
+            "args": ""
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Client",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "stopOnEntry": false,
+            "mainClass": "echoserver.Client",
+            "args": ""
+        },
+        {
+            "type": "java",
             "name": "Debug (Attach)",
             "request": "attach",
             "hostName": "localhost",
