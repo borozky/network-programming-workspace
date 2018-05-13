@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -73,7 +74,8 @@ public class MultiPlayerServer {
 		do {
 			Socket socket = serverSocket.accept();
 			serverCallback.onClientConnected(multiPlayerServer, socket);
-			ServerProcess process = new ServerProcess(game, socket, serverCallback);
+			GameManager gameManager = new GameManager(game);
+			ServerProcess process = new ServerProcess(gameManager, socket, serverCallback);
 			Thread thread = new Thread(process);
 			thread.start();
 			processes.put(socket, process);

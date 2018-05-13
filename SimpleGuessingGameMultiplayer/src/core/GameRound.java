@@ -62,20 +62,20 @@ public class GameRound {
 		if (players.contains(player) && player.getNumGuesses() < 10) {
 			player.addGuess(guess);
 			guesses.add(guess);
-			callbacks.forEach(c -> c.onGuessAdded(this, player, guess));
+			//callbacks.forEach(c -> c.onGuessAdded(this, player, guess));
 		}
 		
 		// if guess if correct, player won
 		if (isGuessMatch(guess)) {
 			addWinner(player);
-			callbacks.forEach(c -> c.onPlayerWon(this, player, player.getNumGuesses()));
+			//callbacks.forEach(c -> c.onPlayerWon(this, player, player.getNumGuesses()));
 			return;
 		}
 		
 		// if the 10th (this guess) is incorrect, player lost
 		if (player.getNumGuesses() == 10 && isGuessMatch(guess) == false) {
 			addLoser(player);
-			callbacks.forEach(c -> c.onPlayerLost(this, player, secretCode));
+			//callbacks.forEach(c -> c.onPlayerLost(this, player, secretCode));
 			return;
 		}
 	}
@@ -155,7 +155,7 @@ public class GameRound {
 		}
 		
 		this.hasEnded = true;
-		callbacks.forEach(c -> c.onRoundEnded(null, this));
+		//callbacks.forEach(c -> c.onRoundEnded(null, this));
 	}
 	
 	

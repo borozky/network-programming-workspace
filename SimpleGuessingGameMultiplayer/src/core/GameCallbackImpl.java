@@ -8,12 +8,10 @@ import server.ServerProcess;
 
 public class GameCallbackImpl implements GameCallback {
 	
-	private ServerProcess process;
 	private ObjectOutputStream stream;
 	
-	public GameCallbackImpl(ServerProcess process) {
-		this.process = process;
-		this.stream = process.getObjectOutputStream();
+	public GameCallbackImpl(ObjectOutputStream stream) {
+		this.stream = stream;
 	}
 	
 	private void reply(String message) {

@@ -6,44 +6,28 @@ import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import core.Game;
-import core.GameCallback;
 import core.GameCallbackImpl;
-import core.GameRound;
-import core.Player;
+import core.GameCallbackLoggerImpl;
 
 public class ServerProcess implements Runnable {
 	
 	public static final Object LOCK = new Object();
 	
-	// required fields
-	private Game game;
 	private Socket socket;
+	private GameManager manager;
 	private ServerCallback cb;
-	
-	// derived fields
-	private ObjectOutputStream objectOutputStream;
+	private ObjectOutputStream stream;
 	private BufferedReader reader;
-	private Player player;
 	
-	public ServerProcess(Game game, Socket socket, ServerCallback callback) throws IOException {
-		this.game = game;
+	public ServerProcess(GameManager manager, Socket socket, ServerCallback callback) throws IOException {
+		this.manager = manager;
 		this.socket = socket;
-		cb = callback;
-		
-		objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-		reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		
-		GameCallback cb = new GameCallbackImpl(this);
-		game.addCallback(cb);	
-	}
+		this.cb = callback;
+		this.stream = new ObjectOutputStream(socket.getOutputStream());
+		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 	
-	public ObjectOutputStream getObjectOutputStream() {
-		return objectOutputStream;
-	}
-	
-	public Player getPlayer() {
-		return player;
+		manager.addCallback(new GameCallbackImpl(stream));
+		manager.addCallback(new GameCallbackLoggerImpl());
 	}
 	
 	
@@ -52,10 +36,67 @@ public class ServerProcess implements Runnable {
 		
 		try {
 			
+			String name = readline("Enter your name: ", true);
+			manager.setPlayerName(name);
+			
+			
+			if (manager.isCurrentPlayerFirst() == false) {
+				if (manager.getNumDigits() < 3 || manager.getNumDigits() > 8) {
+					reply("Waiting for the first player to setup num of digits");
+				}
+			}
+			
+			
+			synchronized (LOCK) {
+				if (manager.getNumDigits() < 3 || manager.getNumDigits() > 8) {
+					int digits = getNumDigits();
+					manager.setNumDigits(digits);
+				}
+			}
+			
+			
+			synchronized (LOCK) {
+				if (manager.getNumPlayers() < 3) {
+					reply("Waiting for other players...");
+					LOCK.wait();
+				}
+				
+				if (manager.getNumPlayers() >= 3) {
+					LOCK.notifyAll();
+				}
+			}
+			
+			
+			synchronized (LOCK) {
+				manager.startNextRound();
+			}
+			
+			
+			do {
+				String guess = readline("Enter your guess: ");
+				manager.addGuess(guess);
+				
+				if (manager.playerWins() || manager.playerLoses()) {
+					break;
+				}
+				
+				
+				// TODO: Continue or quit
+				
+			} while (true);
+			
+			
+			
+			
+			
+			/*
 			// ask for player name
 			String playerName = readline("Enter your name: ", true);
 			reply("Your player name is " + playerName);
 			player = game.signUpPlayer(playerName);
+			
+			// PLAYER SIGNED UP
+			gameCb.onPlayerSignedUp(game, null, player);
 			
 			GameRound round = null;
 			
@@ -84,30 +125,38 @@ public class ServerProcess implements Runnable {
 			
 			synchronized (LOCK) {
 				if (game.getCurrentRound() == null) {
-					game.startNextRound();
+					round = game.startNextRound();
+					gameCb.onSecretCodeCreated(game, round.getSecretCode());
 				}
 			}
 			
-			round = game.getCurrentRound();
+			// ROUND STARTED
+			gameCb.onRoundStarted(game, round);
 			
 			do {
+				
 				String guess = readline("Enter your guess: ");
 				round.addGuess(player, guess);
+				gameCb.onGuessAdded(round, player, guess);
 				
-				if (player.hasWon(round) || player.hasLost(round)) {
+				if (player.hasWon(round)) {
+					gameCb.onPlayerWon(round, player, player.getNumGuesses());
+					break;
+				} else if (player.hasLost(round)) {
+					gameCb.onPlayerLost(round, player, round.getSecretCode());
 					break;
 				}
-			} 
-			while (true);
-			
-			
-			
+				
+			} while (true);
+			*/
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			manager.removeCurrentPlayer();
+			
 			close();
 		}
 	}
@@ -126,7 +175,7 @@ public class ServerProcess implements Runnable {
 
 	public void close() {
 		try {
-			if (objectOutputStream != null) objectOutputStream.close();
+			if (stream != null) stream.close();
 			if (reader != null) reader.close();
 			if (socket != null) socket.close();
 		} catch (IOException e) {
@@ -135,22 +184,22 @@ public class ServerProcess implements Runnable {
 	}
 	
 	
-	public void reply(String message) throws IOException {
-		objectOutputStream.writeObject(new Response(message));
+	private void reply(String message) throws IOException {
+		stream.writeObject(new Response(message));
 	}
 	
-	public String readline(String message) throws IOException {
+	private String readline(String message) throws IOException {
 		return readline(message, false);
 	}
 
-	public String readline(String message, boolean isRequired) throws IOException {
-		objectOutputStream.writeObject(new Response(message, Response.READLINE));
+	private String readline(String message, boolean isRequired) throws IOException {
+		stream.writeObject(new Response(message, Response.READLINE));
 		
 		String line = reader.readLine();
 		if (isRequired) {
 			while (line.trim().isEmpty()) {
 				sendError("Please enter non empty input.");
-				objectOutputStream.writeObject(new Response(message, Response.READLINE));
+				stream.writeObject(new Response(message, Response.READLINE));
 				line = reader.readLine();
 			}
 		}
@@ -158,7 +207,7 @@ public class ServerProcess implements Runnable {
 		return line.trim();
 	}
 	
-	public boolean yesOrNo(String message) throws IOException  {
+	private boolean yesOrNo(String message) throws IOException  {
 		String response = "";
 		
 		response = readline(message);
@@ -176,11 +225,11 @@ public class ServerProcess implements Runnable {
 		}
 	}
 	
-	public void sendError(String message) throws IOException {
-		objectOutputStream.writeObject(new Response("ERROR: " + message));
+	private void sendError(String message) throws IOException {
+		stream.writeObject(new Response("ERROR: " + message));
 	}
 	
-	public int readInt(String message) throws IOException {
+	private int readInt(String message) throws IOException {
 		String reply = readline(message, true);
 		int num = 0;
 		

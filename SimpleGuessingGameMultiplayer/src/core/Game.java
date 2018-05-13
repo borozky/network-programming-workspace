@@ -22,11 +22,11 @@ public class Game {
 	}
 	
 	public void start() {
-		callbacks.forEach(c -> c.onStart(this));
+		//callbacks.forEach(c -> c.onStart(this));
 	}
 	
 	public void addCallback(GameCallback callback) {
-		callbacks.add(callback);
+		//callbacks.add(callback);
 	}
 	
 	public synchronized int getNumDigits() {
@@ -79,12 +79,12 @@ public class Game {
 		
 		// create secret code
 		String secretCode = createSecretCode(numDigits);
-		callbacks.forEach(c -> c.onSecretCodeCreated(this, secretCode));
+		//callbacks.forEach(c -> c.onSecretCodeCreated(this, secretCode));
 		
 		
 		// start new round
 		currentRound = new GameRound(secretCode);
-		callbacks.forEach(c -> currentRound.addCallback(c));
+		//callbacks.forEach(c -> currentRound.addCallback(c));
 		
 		// add players
 		for (Player p : players) {
@@ -92,7 +92,7 @@ public class Game {
 		}
 		
 		rounds.add(currentRound);
-		callbacks.forEach(c -> c.onRoundStarted(this, currentRound));
+		//callbacks.forEach(c -> c.onRoundStarted(this, currentRound));
 		
 		
 		return getCurrentRound();
@@ -107,7 +107,7 @@ public class Game {
 		
 		Player player = new Player(playerName);
 		players.add(player);
-		callbacks.forEach(c -> c.onPlayerSignedUp(this, currentRound, player));
+		//callbacks.forEach(c -> c.onPlayerSignedUp(this, currentRound, player));
 		
 		return player;
 	}
