@@ -3,55 +3,84 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import core.Game;
 import core.GameCallback;
 import core.GameCallbackImpl;
+import core.GameCallbackLoggerImpl;
 
 public class MultiPlayerServer {
+	
+	public static final Object LOCK = new Object();
 	
 	public static final int DEFAULT_PORT = 15376;
 	
 	private int port;
 	private Game game;
 	
+	private List<ServerCallback> serverCallbacks = new ArrayList<>();
+	private List<GameCallback> gameCallbacks = new ArrayList<>();
+	
 	private ServerSocket serverSocket;
-	private Map<String, ServerProcess> serverProcesses = new ConcurrentHashMap<>();
 	
-	private GameCallback gameCallback;
-	private ServerCallback serverCallback;
-	
-	
-	public MultiPlayerServer(int port, Game game, 
-			GameCallback gameCallback, ServerCallback serverCallback) 
-			throws IOException {
-		
-		
-		
+	public MultiPlayerServer(int port, Game game) {
+		this.port = port;
+		this.game = game;
 	}
 	
+	public void start() throws IOException {
+		serverSocket = new ServerSocket(port);
+		serverCallbacks.forEach(c -> c.onServerStarted(this, port));
+	}
 	
+	public void addServerCallback(ServerCallback callback) {
+		serverCallbacks.add(callback);
+	}
 	
+	public ServerSocket getServerSocket() {
+		return serverSocket;
+	}
 	
+	public Game getGame() {
+		return game;
+	}
 	
+	public List<GameCallback> getGameCallbacks() {
+		return gameCallbacks;
+	}
+	
+	public List<ServerCallback> getServerCallbacks() {
+		return serverCallbacks;
+	}
 
 	public static void main(String[] args) throws IOException {
 		
-		Map<String, ServerProcess> serverProcesses = new ConcurrentHashMap<>();
-		ServerSocket ss = new ServerSocket(DEFAULT_PORT);
-		GameCallback gameCallback = new GameCallbackImpl();
-		Game game = new Game(gameCallback);
+		Game game = new Game();
 		ServerCallback serverCallback = new ServerCallbackImpl();
+		Map<Socket, ServerProcess> processes = new ConcurrentHashMap<>();
+		MultiPlayerServer multiPlayerServer = new MultiPlayerServer(DEFAULT_PORT, game);
+		multiPlayerServer.addServerCallback(serverCallback);
+		multiPlayerServer.start();
+		ServerSocket serverSocket = multiPlayerServer.getServerSocket();
+		
+		game.addCallback(new GameCallbackLoggerImpl());
+		game.start();
 		
 		do {
-			Socket socket = ss.accept();
-			String address = socket.getInetAddress().toString();
+			Socket socket = serverSocket.accept();
+			serverCallback.onClientConnected(multiPlayerServer, socket);
 			ServerProcess process = new ServerProcess(game, socket, serverCallback);
-			serverProcesses.put(address, process);
-			process.run();
-		} while (true);
+			Thread thread = new Thread(process);
+			thread.start();
+			processes.put(socket, process);
+		} 
+		while (true);
+		
+		
 
 	}
 

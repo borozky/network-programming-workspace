@@ -1,6 +1,11 @@
 package server;
 
-public class Response {
+import java.io.Serializable;
+
+public class Response implements Serializable {
+
+	private static final long serialVersionUID = 4983949626381604239L;
+	
 	public static final int PRINTMESSAGE = 0;
 	public static final int READLINE = 1;
 	public static final int QUIT = 2;

@@ -5,17 +5,36 @@ import java.util.List;
 
 public class Game {
 	
+	public static final int NOT_STARTED = 0;
+	public static final int STARTED = 1;
+	
 	List<GameRound> rounds = new ArrayList<>();
 	private GameRound currentRound;
-	private GameCallback cb;
 	
-	public Game(GameCallback callback) {
-		setCallback(callback);
-		cb.onStart(this);
+	private List<GameCallback> callbacks = new ArrayList<>();
+	
+	
+	private List<Player> players = new ArrayList<>();
+	private int numDigits = 0;
+	
+	public Game() {
+		
 	}
 	
-	public void setCallback(GameCallback callback) {
-		cb = callback;
+	public void start() {
+		callbacks.forEach(c -> c.onStart(this));
+	}
+	
+	public void addCallback(GameCallback callback) {
+		callbacks.add(callback);
+	}
+	
+	public synchronized int getNumDigits() {
+		return numDigits;
+	}
+	
+	public synchronized void setNumDigits(int numDigits) {
+		this.numDigits = numDigits;
 	}
 	
 	// generate secret code
@@ -43,23 +62,37 @@ public class Game {
 		return currentRound;
 	}
 	
+	public void removePlayer(Player player) {
+		players.remove(player);
+	}
+	
 	
 	// end the current round and start new one
-	public GameRound startNextRound(int numDigits) {
-		if (currentRound != null) {
-			currentRound.end();
+	public GameRound startNextRound() throws Exception {
+		if (currentRound != null && !currentRound.hasEnded() ) {
+			throw new Exception("Current round has not yet ended");
+		}
+		
+		if (players.size() == 0) {
+			throw new Exception("There are currently no players available");
 		}
 		
 		// create secret code
 		String secretCode = createSecretCode(numDigits);
-		cb.onSecretCodeCreated(this, secretCode);
+		callbacks.forEach(c -> c.onSecretCodeCreated(this, secretCode));
 		
 		
 		// start new round
 		currentRound = new GameRound(secretCode);
-		currentRound.setCallback(cb);
+		callbacks.forEach(c -> currentRound.addCallback(c));
+		
+		// add players
+		for (Player p : players) {
+			currentRound.addPlayer(p);
+		}
+		
 		rounds.add(currentRound);
-		cb.onRoundStarted(this, currentRound);
+		callbacks.forEach(c -> c.onRoundStarted(this, currentRound));
 		
 		
 		return getCurrentRound();
@@ -67,20 +100,14 @@ public class Game {
 	
 	
 	// sign up player in the current round
-	public Player signUpPlayer(String playerName) throws Exception {
-		Player player = new Player(playerName);
-		
-		if (currentRound == null) {
-			throw new Exception("Current round is empty");
-		}
-		
-		if (currentRound.getPlayers().size() == 6) {
+	public synchronized Player signUpPlayer(String playerName) throws Exception {
+		if (getPlayers().size() == 6) {
 			throw new Exception("Cannot add more than 6 players");
 		}
 		
-		// Signing up player is adding player to current round
-		currentRound.addPlayer(player);
-		cb.onPlayerSignedUp(this, currentRound, player);
+		Player player = new Player(playerName);
+		players.add(player);
+		callbacks.forEach(c -> c.onPlayerSignedUp(this, currentRound, player));
 		
 		return player;
 	}
@@ -88,10 +115,7 @@ public class Game {
 	
 	// get players in current round
 	public List<Player> getPlayers() {
-		if (currentRound != null) {
-			return currentRound.getPlayers();
-		}
-		return null;
+		return players;
 	}
 	
 }

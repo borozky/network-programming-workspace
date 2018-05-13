@@ -6,14 +6,12 @@ public class ServerCallbackImpl implements ServerCallback {
 
 	@Override
 	public void onServerStarted(MultiPlayerServer server, int port) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("Server started on port " + port);
 	}
 
 	@Override
 	public void onClientConnected(MultiPlayerServer server, Socket socket) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("Client " + socket.getInetAddress().toString() + " connected.");
 	}
 
 	@Override

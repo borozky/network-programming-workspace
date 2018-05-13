@@ -8,7 +8,7 @@ import java.util.List;
 public class GameRound {
 	
 	private String secretCode;
-	private GameCallback cb;
+	private List<GameCallback> callbacks = new ArrayList<>();
 	
 	List<Player> players = new ArrayList<>();
 	List<Player> winners = new ArrayList<>();
@@ -27,9 +27,9 @@ public class GameRound {
 		player.clearAllGuesses();
 		players.add(player);
 	}
-
-	public void setCallback(GameCallback cb) {
-		this.cb = cb;
+	
+	public void addCallback(GameCallback callback) {
+		callbacks.add(callback);
 	}
 	
 	public String getSecretCode() {
@@ -59,23 +59,23 @@ public class GameRound {
 		}
 		
 		// add guess
-		if (players.contains(player) && player.getNumGuesses() > 10) {
+		if (players.contains(player) && player.getNumGuesses() < 10) {
 			player.addGuess(guess);
 			guesses.add(guess);
-			cb.onGuessAdded(this, player, guess);
+			callbacks.forEach(c -> c.onGuessAdded(this, player, guess));
 		}
 		
 		// if guess if correct, player won
 		if (isGuessMatch(guess)) {
 			addWinner(player);
-			cb.onPlayerWon(this, player, player.getNumGuesses());
+			callbacks.forEach(c -> c.onPlayerWon(this, player, player.getNumGuesses()));
 			return;
 		}
 		
 		// if the 10th (this guess) is incorrect, player lost
 		if (player.getNumGuesses() == 10 && isGuessMatch(guess) == false) {
 			addLoser(player);
-			cb.onPlayerLost(this, player, secretCode);
+			callbacks.forEach(c -> c.onPlayerLost(this, player, secretCode));
 			return;
 		}
 	}
@@ -155,7 +155,7 @@ public class GameRound {
 		}
 		
 		this.hasEnded = true;
-		cb.onRoundEnded(null, this);
+		callbacks.forEach(c -> c.onRoundEnded(null, this));
 	}
 	
 	
