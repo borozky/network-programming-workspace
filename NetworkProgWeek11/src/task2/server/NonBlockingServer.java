@@ -96,13 +96,13 @@ public class NonBlockingServer {
 							
 							try {
 								buffer.clear();
-								socketChannel.read(buffer);
-								buffer.flip();
-								
-								byte[] bytes = new byte[buffer.limit()];
-								buffer.get(bytes);
-								response = new String(bytes).trim();
-								System.out.println("Client: " + response);
+								if (socketChannel.read(buffer) > 0) {
+									buffer.flip();
+									byte[] bytes = new byte[buffer.limit()];
+									buffer.get(bytes);
+									response = new String(bytes).trim();
+									System.out.println("Client: " + response);
+								}
 								
 								socketChannel.register(selector, SelectionKey.OP_WRITE);
 							} catch (IOException e) {
