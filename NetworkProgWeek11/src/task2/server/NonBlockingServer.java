@@ -96,15 +96,23 @@ public class NonBlockingServer {
 							
 							try {
 								buffer.clear();
-								if (socketChannel.read(buffer) > 0) {
+								
+								// read from client. May return 0 or -1
+								int c = socketChannel.read(buffer);
+								if (c > 0) {
 									buffer.flip();
 									byte[] bytes = new byte[buffer.limit()];
 									buffer.get(bytes);
 									response = new String(bytes).trim();
 									System.out.println("Client: " + response);
+									socketChannel.register(selector, SelectionKey.OP_WRITE);
+								}
+								// End of stream. In that case, close the connection
+								else if (c == -1) {
+									System.err.println("Client closed the connection.");
+									if (socketChannel != null) socketChannel.close();
 								}
 								
-								socketChannel.register(selector, SelectionKey.OP_WRITE);
 							} catch (IOException e) {
 								System.err.println("Sorry something went wrong. " + e.getMessage());
 								if (socketChannel != null) socketChannel.close();
@@ -117,6 +125,8 @@ public class NonBlockingServer {
 						// write buffer contents to the client
 						// decided whether to close the connection or not
 						if (key.isValid() && key.isWritable()) {
+							
+							// writing may create problems, if that's the case, close the connection
 							try {
 								buffer.flip();
 								socketChannel.write(buffer);
