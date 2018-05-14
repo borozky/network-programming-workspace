@@ -12,12 +12,20 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * Program that accepts and sends back inputs from the client. 
+ * Server closes when client quits or when it receives a single 'x'.
+ * <p>You can pass 1 optional argument<ul>
+ * <li>The first argument is the port number. Defaults to port 15376</li></ul>
+ */
 public class NonBlockingServer {
 	
 	public static final int SERVER_PORT = 15376;
 	public static final int BUFFER_SIZE = 4096;
 	
 	public static void main(String[] args) throws Exception {
+
+		int port = getPortNumber(args);
 		
 		ByteBuffer buffer = null;
 		SocketAddress address = null;
@@ -29,7 +37,7 @@ public class NonBlockingServer {
 		
 		try {
 			// launch server
-			address = new InetSocketAddress(SERVER_PORT);
+			address = new InetSocketAddress(port);
 			serverSocketChannel = ServerSocketChannel.open();
 			serverSocket = serverSocketChannel.socket();
 			serverSocket.bind(address);
@@ -49,14 +57,16 @@ public class NonBlockingServer {
 			
 			while (true) {
 				
+				// select() will block until an operation (eg. ACCEPT, READ, WRITE) is ready
 				int readyCount = selector.select();
 				if (readyCount <= 0) {
 					continue;
 				}
-				
+
 				Set<SelectionKey> selectionKeys = selector.selectedKeys();
 				Iterator<SelectionKey> iterator = selectionKeys.iterator();
-				
+
+
 				while (iterator.hasNext()) {
 					SelectionKey key = iterator.next();
 					iterator.remove();
@@ -108,11 +118,12 @@ public class NonBlockingServer {
 						}
 					}
 					
-				}
+				} // end while
+				
 			}
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Sorry. Something went wrong. " + e.getMessage());
 		}
 		finally {
 			try {
@@ -124,6 +135,31 @@ public class NonBlockingServer {
 				System.err.println("Sorry, something went wrong while closing the connection. " + e.getMessage());
 			}
 		}
+	}
+
+
+	/**
+	 * Gets the main port number from command line arguments.<br/>
+	 * The main port number must be the first command line argument
+	 * 
+	 * @param args
+	 * @return int
+	 */
+	public static int getPortNumber(String[] args) {
+		int portNumber = SERVER_PORT;
+		
+		if (args.length < 1) {
+			return portNumber;
+		}
+		
+		try {
+			portNumber = Integer.parseInt(args[0]);
+		}
+		catch (NumberFormatException numFormatEx) {
+			System.err.printf("%s is not a valid port number", args[0]);
+		}
+		
+		return portNumber;
 	}
 	
 	
