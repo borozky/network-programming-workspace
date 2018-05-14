@@ -68,55 +68,64 @@ public class NonBlockingServer {
 
 
 				while (iterator.hasNext()) {
-					SelectionKey key = iterator.next();
-					iterator.remove();
-					
-					// setup connection
-					if (key.isAcceptable()) {
-						socketChannel = serverSocketChannel.accept();
-						socketChannel.configureBlocking(false);
-						socketChannel.register(selector, SelectionKey.OP_READ);
-						System.out.println("Client " + socketChannel.getRemoteAddress() + " connected");
+
+					try {
+						SelectionKey key = iterator.next();
+						iterator.remove();
 						
-						buffer = ByteBuffer.allocate(BUFFER_SIZE);
-					}
-					
-					// READ client replies
-					// do not decide to close the connection here, 
-					// do that after we sent our replies to the client
-					if (key.isReadable()) {
-						buffer.clear();
-						socketChannel.read(buffer);
-						buffer.flip();
-						
-						byte[] bytes = new byte[buffer.limit()];
-						buffer.get(bytes);
-						response = new String(bytes).trim();
-						System.out.println("Client: " + response);
-						
-						socketChannel.register(selector, SelectionKey.OP_WRITE);
-						
-						// do not clear the buffer, we're going to use the buffer for writing
-					}
-					
-					// write buffer contents to the client
-					// decided whether to close the connection or not
-					if (key.isWritable()) {
-						buffer.flip();
-						socketChannel.write(buffer);
-						
-						
-						if (response.equals("x")) {
-							// do not register an OP_ACCEPT here, or else it will throw ClosedChannelException here
-							// just close the socket and the selector will take care of the rest
-							String addr = socketChannel.getRemoteAddress().toString();
-							socketChannel.close();
-							System.out.println("Connection to client " + addr + " closed successfully.");
-						} else {
-							// we're expecting the client to send a reply for us to READ
+						// setup connection
+						if (key.isAcceptable()) {
+							socketChannel = serverSocketChannel.accept();
+							socketChannel.configureBlocking(false);
 							socketChannel.register(selector, SelectionKey.OP_READ);
+							System.out.println("Client " + socketChannel.getRemoteAddress() + " connected");
+							
+							buffer = ByteBuffer.allocate(BUFFER_SIZE);
+						}
+						
+						// READ client replies
+						// do not decide to close the connection here, 
+						// do that after we sent our replies to the client
+						if (key.isReadable()) {
+							buffer.clear();
+							socketChannel.read(buffer);
+							buffer.flip();
+							
+							byte[] bytes = new byte[buffer.limit()];
+							buffer.get(bytes);
+							response = new String(bytes).trim();
+							System.out.println("Client: " + response);
+							
+							socketChannel.register(selector, SelectionKey.OP_WRITE);
+							
+							// do not clear the buffer, we're going to use the buffer for writing
+						}
+						
+						// write buffer contents to the client
+						// decided whether to close the connection or not
+						if (key.isWritable()) {
+							buffer.flip();
+							socketChannel.write(buffer);
+							
+							
+							if (response.equals("x")) {
+								// do not register an OP_ACCEPT here, or else it will throw ClosedChannelException here
+								// just close the socket and the selector will take care of the rest
+								String addr = socketChannel.getRemoteAddress().toString();
+								socketChannel.close();
+								System.out.println("Connection to client " + addr + " closed successfully.");
+							} else {
+								// we're expecting the client to send a reply for us to READ
+								socketChannel.register(selector, SelectionKey.OP_READ);
+							}
 						}
 					}
+					catch (IOException e) {
+						System.err.println("Sorry something went wrong. " + e.getMessage());
+						if (socketChannel != null) socketChannel.close();
+					}
+
+					
 					
 				} // end while
 				
