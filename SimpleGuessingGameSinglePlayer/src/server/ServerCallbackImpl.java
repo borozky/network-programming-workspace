@@ -5,9 +5,20 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Default implementation of ServerCallback interface. 
+ * Will use the console and loggers to print and log message events. 
+ * For convenience of the developer, each public overriden method will have a corresponding
+ * private methods so that the method names will be logged. 
+ * This way we could identify what events have happended.
+ * 
+ * @author user
+ *
+ */
 public class ServerCallbackImpl implements ServerCallback {
 	
 	private Logger logger;
+	
 	public ServerCallbackImpl(Logger logger) {
 		this.logger = logger;
 	}

@@ -3,6 +3,12 @@ package core;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Player entity. The state and data sent by the client will reflect on this class.
+ * 
+ * @author user
+ *
+ */
 public class Player {
 	
 	public enum PlayerStatus {

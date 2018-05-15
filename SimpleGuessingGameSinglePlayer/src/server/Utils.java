@@ -6,8 +6,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+/**
+ * Helper class to provided utility methods such as logging.
+ * 
+ * @author user
+ *
+ */
 public class Utils {
 
+	/**
+	 * Create a logger object. The logger that is created will be file based. 
+	 * If the log file doesn't exist, it will create one.
+	 * 
+	 * @param fileName
+	 * @param className
+	 * @return
+	 */
 	public static <T> Logger createLogger(String fileName, Class<T> className) {
 		Logger logger = Logger.getLogger(className.getName());
 		logger.setUseParentHandlers(false);

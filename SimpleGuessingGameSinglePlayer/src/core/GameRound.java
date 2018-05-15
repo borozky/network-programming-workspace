@@ -3,6 +3,12 @@ package core;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class that represents the round. 
+ * 
+ * @author user
+ *
+ */
 public class GameRound {
 	
 	public static final int MAX_ATTEMPTS = 10;
@@ -70,6 +76,13 @@ public class GameRound {
 		return secretCode.trim().length();
 	}
 	
+	/**
+	 * Handles how guesses will be recorded. 
+	 * By adding new guess you can the state of the round (WINNING, LOSING, FORFEIT)
+	 * 
+	 * @param player
+	 * @param guess
+	 */
 	public void addGuess(Player player, String guess) {
 		// if player won, no need to add guess
 		if (hasWinner(player) || hasLoser(player)) {
