@@ -5,14 +5,13 @@ import java.util.List;
 
 public class Game {
 	
-	public static final int NOT_STARTED = 0;
-	public static final int STARTED = 1;
+	public static final int MAX_PLAYERS = 6;
+	public static final int MIN_PLAYERS = 3;
+	public static final int MIN_DIGITS = 3;
+	public static final int MAX_DIGITS = 8;
 	
 	List<GameRound> rounds = new ArrayList<>();
 	private GameRound currentRound;
-	
-	private List<GameCallback> callbacks = new ArrayList<>();
-	
 	
 	private List<Player> players = new ArrayList<>();
 	private int numDigits = 0;
@@ -22,11 +21,7 @@ public class Game {
 	}
 	
 	public void start() {
-		//callbacks.forEach(c -> c.onStart(this));
-	}
-	
-	public void addCallback(GameCallback callback) {
-		//callbacks.add(callback);
+		
 	}
 	
 	public synchronized int getNumDigits() {
@@ -79,20 +74,18 @@ public class Game {
 		
 		// create secret code
 		String secretCode = createSecretCode(numDigits);
-		//callbacks.forEach(c -> c.onSecretCodeCreated(this, secretCode));
 		
 		
 		// start new round
 		currentRound = new GameRound(secretCode);
-		//callbacks.forEach(c -> currentRound.addCallback(c));
 		
 		// add players
 		for (Player p : players) {
+			p.resetGuesses();
 			currentRound.addPlayer(p);
 		}
 		
 		rounds.add(currentRound);
-		//callbacks.forEach(c -> c.onRoundStarted(this, currentRound));
 		
 		
 		return getCurrentRound();
@@ -101,13 +94,12 @@ public class Game {
 	
 	// sign up player in the current round
 	public synchronized Player signUpPlayer(String playerName) throws Exception {
-		if (getPlayers().size() == 6) {
-			throw new Exception("Cannot add more than 6 players");
+		if (getPlayers().size() == MAX_PLAYERS) {
+			throw new Exception("Cannot add more than " + MAX_PLAYERS + " players");
 		}
 		
 		Player player = new Player(playerName);
 		players.add(player);
-		//callbacks.forEach(c -> c.onPlayerSignedUp(this, currentRound, player));
 		
 		return player;
 	}

@@ -5,29 +5,50 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.logging.Logger;
 
+import core.Game;
+import core.GameCallback;
 import core.GameCallbackImpl;
 import core.GameCallbackLoggerImpl;
+import core.GameManager;
 
 public class ServerProcess implements Runnable {
 	
 	public static final Object LOCK = new Object();
+	public static final int WAITING_TIME_SECONDS = 20;
 	
 	private Socket socket;
-	private GameManager manager;
 	private ServerCallback cb;
 	private ObjectOutputStream stream;
 	private BufferedReader reader;
+	private Game game;
+	private GameManager manager;
 	
-	public ServerProcess(GameManager manager, Socket socket, ServerCallback callback) throws IOException {
-		this.manager = manager;
+	public ServerProcess(Game game, Socket socket, ServerCallback callback, GameCallbackLoggerImpl gameLoggerCallback) throws IOException {
+		this.game = game;
 		this.socket = socket;
 		this.cb = callback;
 		this.stream = new ObjectOutputStream(socket.getOutputStream());
 		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		this.manager = new GameManager(game);
+		
+		
+		GameCallback cb = new GameCallbackImpl(stream);
+		manager.addCallback(cb);
+		manager.addCallback(gameLoggerCallback);
+	}
 	
-		manager.addCallback(new GameCallbackImpl(stream));
-		manager.addCallback(new GameCallbackLoggerImpl());
+	public Socket getSocket() {
+		return socket;
+	}
+	
+	public Game getGame() {
+		return game;
+	}
+	
+	public GameManager getGameManager() {
+		return manager;
 	}
 	
 	
@@ -36,16 +57,16 @@ public class ServerProcess implements Runnable {
 		
 		try {
 			
-			String name = readline("Enter your name: ", true);
-			manager.setPlayerName(name);
-			
+			if (manager.getCurrentPlayer() == null) {
+				String name = readline("Enter your name: ", true);
+				manager.setCurrentPlayerName(name);
+			}
 			
 			if (manager.isCurrentPlayerFirst() == false) {
-				if (manager.getNumDigits() < 3 || manager.getNumDigits() > 8) {
+				if (manager.getNumDigits() < Game.MIN_DIGITS || manager.getNumDigits() > Game.MAX_DIGITS) {
 					reply("Waiting for the first player to setup num of digits");
 				}
 			}
-			
 			
 			synchronized (LOCK) {
 				if (manager.getNumDigits() < 3 || manager.getNumDigits() > 8) {
@@ -54,14 +75,13 @@ public class ServerProcess implements Runnable {
 				}
 			}
 			
-			
 			synchronized (LOCK) {
-				if (manager.getNumPlayers() < 3) {
+				if (manager.getNumPlayers() < Game.MIN_PLAYERS) {
 					reply("Waiting for other players...");
-					LOCK.wait();
+					LOCK.wait(WAITING_TIME_SECONDS * 1000);
 				}
 				
-				if (manager.getNumPlayers() >= 3) {
+				if (manager.getNumPlayers() >= Game.MIN_PLAYERS) {
 					LOCK.notifyAll();
 				}
 			}
@@ -69,6 +89,7 @@ public class ServerProcess implements Runnable {
 			
 			synchronized (LOCK) {
 				manager.startNextRound();
+				manager.joinCurrentPlayer();
 			}
 			
 			
@@ -76,96 +97,83 @@ public class ServerProcess implements Runnable {
 				String guess = readline("Enter your guess: ");
 				manager.addGuess(guess);
 				
+				if (manager.isCurrentPlayerForfeited()) {
+					break;
+				}
+				
 				if (manager.playerWins() || manager.playerLoses()) {
 					break;
 				}
 				
-				
-				// TODO: Continue or quit
-				
 			} while (true);
 			
 			
-			
-			
-			
-			/*
-			// ask for player name
-			String playerName = readline("Enter your name: ", true);
-			reply("Your player name is " + playerName);
-			player = game.signUpPlayer(playerName);
-			
-			// PLAYER SIGNED UP
-			gameCb.onPlayerSignedUp(game, null, player);
-			
-			GameRound round = null;
-			
-			
-			if (game.getPlayers().get(0) != player ) {
-				reply("Waiting for the first player to setup num of digits");
-			}
-			
 			synchronized (LOCK) {
-				if (game.getNumDigits() < 3 || game.getNumDigits() > 8) {
-					int numDigits = getNumDigits();
-					game.setNumDigits(numDigits);
-				}
-			}
-			
-			synchronized (LOCK) {
-				if (game.getPlayers().size() < 3) {
-					reply("Waiting for other players...");
+				if ( ! manager.isRoundEnded()) {
+					reply("Wait for other players to finish...");
 					LOCK.wait();
-				} 
-				
-				if (game.getPlayers().size() >= 3) {
+				}
+				else {
 					LOCK.notifyAll();
 				}
 			}
 			
+			manager.endCurrentRound();
+					
+			boolean shouldContinue = continueOrQuit("Press (p) to continue to play, or (q) to quit: ");
+			
 			synchronized (LOCK) {
-				if (game.getCurrentRound() == null) {
-					round = game.startNextRound();
-					gameCb.onSecretCodeCreated(game, round.getSecretCode());
+				if (!shouldContinue) {
+					manager.quitPlayer();
+					LOCK.notifyAll();
+				}
+				else {
+					manager.chooseToContinue();
+					if ( !manager.isRoundEnded() || !manager.isAllOtherPlayersChosenToContinueOrQuit() ) {
+						reply("Please wait for other players to finish before next round begins...");
+						LOCK.wait();
+					}
+					
+					if ( manager.isRoundEnded() && manager.isAllOtherPlayersChosenToContinueOrQuit() ) {
+						LOCK.notifyAll();
+					}
 				}
 			}
 			
-			// ROUND STARTED
-			gameCb.onRoundStarted(game, round);
+			if (shouldContinue) {
+				run();
+			}
 			
-			do {
-				
-				String guess = readline("Enter your guess: ");
-				round.addGuess(player, guess);
-				gameCb.onGuessAdded(round, player, guess);
-				
-				if (player.hasWon(round)) {
-					gameCb.onPlayerWon(round, player, player.getNumGuesses());
-					break;
-				} else if (player.hasLost(round)) {
-					gameCb.onPlayerLost(round, player, round.getSecretCode());
-					break;
-				}
-				
-			} while (true);
-			*/
 			
 		} catch (IOException e) {
-			e.printStackTrace();
+			cb.onException(this, e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			cb.onException(this, e);
 		} finally {
-			manager.removeCurrentPlayer();
-			
 			close();
+		}
+	}
+	
+	public boolean continueOrQuit(String message) throws IOException {
+		String reply = readline(message, true);
+		reply = reply.trim().toLowerCase();
+		if (reply.equals("p")) {
+			return true;
+		}
+		else if (reply.equals("q")) {
+			return false;
+		}
+		else {
+			sendError("Please enter 'p' or 'q'.");
+			return continueOrQuit(message);
 		}
 	}
 	
 	public int getNumDigits() throws IOException {
 		int numDigits = 0;
 		numDigits = readInt("Enter number of digits: ");
-		if (numDigits < 3 || numDigits > 8) {
-			sendError("Number of digits must be 3 - 8.");
+		if (numDigits < Game.MIN_DIGITS || numDigits > Game.MAX_DIGITS) {
+			sendError(String.format("Number of digits must be %d - %d.", Game.MIN_DIGITS, Game.MAX_DIGITS));
 			return getNumDigits();
 		}
 		
@@ -174,10 +182,15 @@ public class ServerProcess implements Runnable {
 	}
 
 	public void close() {
+		manager.removeCurrentPlayer();
+		
 		try {
 			if (stream != null) stream.close();
 			if (reader != null) reader.close();
 			if (socket != null) socket.close();
+			
+			cb.onClientDisconnected(null, socket, this);
+			
 		} catch (IOException e) {
 			cb.onException(this, e);
 		}
@@ -185,7 +198,9 @@ public class ServerProcess implements Runnable {
 	
 	
 	private void reply(String message) throws IOException {
-		stream.writeObject(new Response(message));
+		Response response = Response.message(message);
+		stream.writeObject(response);
+		cb.onSendResponse(this, response);
 	}
 	
 	private String readline(String message) throws IOException {
@@ -193,15 +208,16 @@ public class ServerProcess implements Runnable {
 	}
 
 	private String readline(String message, boolean isRequired) throws IOException {
-		stream.writeObject(new Response(message, Response.READLINE));
+		Response response = Response.readLine(message);
+		stream.writeObject(response);
+		cb.onSendResponse(this, response);
 		
 		String line = reader.readLine();
-		if (isRequired) {
-			while (line.trim().isEmpty()) {
-				sendError("Please enter non empty input.");
-				stream.writeObject(new Response(message, Response.READLINE));
-				line = reader.readLine();
-			}
+		cb.onClientReply(this, line);
+		
+		if (isRequired && line.trim().isEmpty()) {
+			sendError("Please enter non empty input.");
+			return readline(message, isRequired);
 		}
 		
 		return line.trim();
@@ -226,7 +242,9 @@ public class ServerProcess implements Runnable {
 	}
 	
 	private void sendError(String message) throws IOException {
-		stream.writeObject(new Response("ERROR: " + message));
+		Response response = Response.message("ERROR: " + message);
+		stream.writeObject(response);
+		cb.onSendResponse(this, response);
 	}
 	
 	private int readInt(String message) throws IOException {

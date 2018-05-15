@@ -1,18 +1,45 @@
 package core;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-public class Player {
+public class Player implements Comparable<Player> {
 	
-	String name;
-	List<String> guesses = new ArrayList<>();
-	String lastGuess = null;
+	public enum PlayerStatus {
+		NOT_STARTED,
+		STARTED,
+		PLAYING,
+		WON,
+		LOST,
+		FORFEITED,
+		CHOSEN_TO_CONTINUE,
+		QUITED
+	}
+	
+	private String name;
+	private List<String> guesses = new ArrayList<>();
+	private String lastGuess = null;
+	private PlayerStatus status = PlayerStatus.NOT_STARTED;
 	
 	public Player(String name) {
 		this.name = name;
 	}
 	
+	public void resetGuesses() {
+		guesses = new ArrayList<>();
+		lastGuess = null;
+	}
+	
+	public PlayerStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(PlayerStatus status) {
+		this.status = status;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -45,5 +72,16 @@ public class Player {
 	public boolean hasLost(GameRound round) {
 		return round.hasLoser(this);
 	}
+	
+	public boolean hasForfeited(GameRound round) {
+		return round.hasForfeited(this);
+	}
+
+	@Override
+	public int compareTo(Player o) {
+		return getNumGuesses() - o.getNumGuesses();
+	}
+	
+	
 
 }

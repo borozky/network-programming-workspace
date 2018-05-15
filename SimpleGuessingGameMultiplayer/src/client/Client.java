@@ -1,6 +1,7 @@
 package client;
 
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -61,6 +62,9 @@ public class Client {
 		catch (UnknownHostException e) {
 			System.err.printf("Server %s:%d cannot be found\n", host, port);
 		}
+		catch (EOFException e) {
+			System.err.print("Client disconnected. ");
+		} 
 		catch (IOException e) {
 			System.err.println("Sorry, something went wrong. " + e.getMessage());
 		}
@@ -70,6 +74,9 @@ public class Client {
 				if (writer != null) writer.close();
 				if (objectInputStream != null) objectInputStream.close();
 				if (socket != null) socket.close();
+				
+				System.out.println("Connection closed.");
+				
 			}
 			catch (IOException e) {
 				System.err.println("Sorry, something went wrong while closing the connection. " + e.getMessage());

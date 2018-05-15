@@ -5,14 +5,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import core.Player.PlayerStatus;
+
 public class GameRound {
 	
+	public static final int MAX_ATTEMPTS = 10;
+	
 	private String secretCode;
-	private List<GameCallback> callbacks = new ArrayList<>();
 	
 	List<Player> players = new ArrayList<>();
 	List<Player> winners = new ArrayList<>();
 	List<Player> losers = new ArrayList<>();
+	List<Player> forfeited = new ArrayList<>();
 	
 	List<String> guesses = new ArrayList<>();
 	
@@ -26,10 +30,6 @@ public class GameRound {
 	public void addPlayer(Player player) {
 		player.clearAllGuesses();
 		players.add(player);
-	}
-	
-	public void addCallback(GameCallback callback) {
-		callbacks.add(callback);
 	}
 	
 	public String getSecretCode() {
@@ -59,7 +59,7 @@ public class GameRound {
 		}
 		
 		// add guess
-		if (players.contains(player) && player.getNumGuesses() < 10) {
+		if (players.contains(player) && player.getNumGuesses() < MAX_ATTEMPTS) {
 			player.addGuess(guess);
 			guesses.add(guess);
 			//callbacks.forEach(c -> c.onGuessAdded(this, player, guess));
@@ -73,7 +73,7 @@ public class GameRound {
 		}
 		
 		// if the 10th (this guess) is incorrect, player lost
-		if (player.getNumGuesses() == 10 && isGuessMatch(guess) == false) {
+		if (player.getNumGuesses() >= MAX_ATTEMPTS && isGuessMatch(guess) == false) {
 			addLoser(player);
 			//callbacks.forEach(c -> c.onPlayerLost(this, player, secretCode));
 			return;
@@ -125,20 +125,34 @@ public class GameRound {
 		return null;
 	}
 	
+	private void addForfeiter(Player player) {
+		if (players.contains(player) && !losers.contains(player) && !winners.contains(player)) {
+			forfeited.add(player);
+		}
+	}
+	
+	public boolean hasForfeited(Player player) {
+		return forfeited.contains(player);
+	}
+	
+	public void forfeit(Player player) {
+		for (int i = player.getNumGuesses(); i < MAX_ATTEMPTS + 1; i++) {
+			player.addGuess(null);
+		}
+		addForfeiter(player);
+	}
+	
 	// this should be sorted
-	public List<Player> getWinners() {
-		Collections.sort(winners, new Comparator<Player>() {
-			@Override
-			public int compare(Player player1, Player player2) {
-				return player1.getNumGuesses() - player2.getNumGuesses();
-			}
-		});
-		
+	public synchronized List<Player> getWinners() {
 		return winners;
 	}
 	
 	public List<Player> getLosers() {
 		return losers;
+	}
+	
+	public List<Player> getForfeiters() {
+		return forfeited;
 	}
 	
 	public boolean hasEnded() {
@@ -156,6 +170,52 @@ public class GameRound {
 		
 		this.hasEnded = true;
 		//callbacks.forEach(c -> c.onRoundEnded(null, this));
+	}
+	
+	public int getNumCorrectPositions(String guess) {
+		int correctPositions = 0;
+		
+		for (int i = 0; i < guess.length(); i++) {
+			
+			if (i > secretCode.length() - 1) {
+				break;
+			}
+			
+			char guessDigit = guess.charAt(i);
+			char secretCodeDigit = secretCode.charAt(i);
+			
+			// correct position
+			if (guessDigit == secretCodeDigit) {
+				correctPositions += 1;
+			}
+		}
+		
+		return correctPositions;
+	}
+	
+	public int getNumIncorrectPositions(String guess) {
+		int incorrectPositions = 0;
+		
+		for (int i = 0; i < guess.length(); i++) {
+			
+			if (i > secretCode.length() - 1) {
+				break;
+			}
+			
+			char guessDigit = guess.charAt(i);
+			char secretCodeDigit = secretCode.charAt(i);
+			
+			if (guessDigit == secretCodeDigit) {
+				continue;
+			}
+			
+			// incorrect position
+			else if (secretCode.contains(new String(new char[] { guessDigit }))) {
+				incorrectPositions += 1;
+			}
+		}
+		
+		return incorrectPositions;
 	}
 	
 	

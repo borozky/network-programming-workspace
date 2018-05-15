@@ -23,7 +23,6 @@ public class GameTests {
 	public void setUp() throws Exception {
 		callback = new GameTests_GameCallbackMock();
 		game = new Game();
-		game.addCallback(callback);
 		game.start();
 		
 		playerNames = new String[] {
@@ -88,7 +87,6 @@ public class GameTests {
 	@Test
 	public void test_signup_6_players_passed() throws Exception {
 		game = new Game();
-		game.addCallback(callback);
 		game.start();
 
 		int numPlayers = 6;
@@ -133,7 +131,7 @@ class GameTests_GameCallbackMock implements GameCallback {
 	}
 
 	@Override
-	public void onRoundStarted(Game game, GameRound round) {
+	public void onRoundStarted(Game game, GameRound round, Player player) {
 		System.out.printf("Round started with %d players\n", round.getPlayers().size());
 	}
 
@@ -163,6 +161,26 @@ class GameTests_GameCallbackMock implements GameCallback {
 	public void onRoundEnded(Game game, GameRound round) {
 		System.out.printf("Round has ended.");
 	}
+	
+	@Override
+	public void onPlayerForfeited(Game game, GameRound round, Player player) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void onPlayerQuited(Game game, Player player) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void onIncorrectGuess(GameRound round, Player player, String guess) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 	
 	
 }
