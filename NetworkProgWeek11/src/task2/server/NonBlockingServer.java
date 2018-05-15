@@ -58,6 +58,7 @@ public class NonBlockingServer {
 			while (true) {
 				
 				// select() will block until an operation (eg. ACCEPT, READ, WRITE) is ready
+				// readyCount may return 0, so let's not process when nothing is ready
 				int readyCount = selector.select();
 				if (readyCount <= 0) {
 					continue;
@@ -70,7 +71,11 @@ public class NonBlockingServer {
 				while (iterator.hasNext()) {
 
 					try {
+						// Get key
 						SelectionKey key = iterator.next();
+
+						// remove recent key to prevent it from being reprocessed again
+						// in the next iteration
 						iterator.remove();
 						
 						// setup connection
@@ -91,7 +96,7 @@ public class NonBlockingServer {
 						
 						// READ client replies
 						// do not decide to close the connection here, 
-						// do that after we sent our replies to the client
+						// do that after we sent our replies to the client, or some error happens
 						if (key.isValid() && key.isReadable()) {
 							
 							try {
@@ -112,7 +117,7 @@ public class NonBlockingServer {
 									System.err.println("Client closed the connection.");
 									if (socketChannel != null) socketChannel.close();
 								}
-								
+							
 							} catch (IOException e) {
 								System.err.println("Sorry something went wrong. " + e.getMessage());
 								if (socketChannel != null) socketChannel.close();
@@ -149,6 +154,7 @@ public class NonBlockingServer {
 
 						}
 					}
+					// Client disconnected for some reason
 					catch (IOException e) {
 						System.err.println("Sorry something went wrong. " + e.getMessage());
 						if (socketChannel != null) socketChannel.close();

@@ -113,6 +113,7 @@ public class Server {
 					
 					
 				}	
+				// Client disconnected for some reason
 				catch (IOException e) {
 					System.err.println("Sorry. client has forcibly closed the connection. Message: " + e.getMessage());
 				}
@@ -120,6 +121,8 @@ public class Server {
 					try {
 						if (socketChannel != null) socketChannel.close();
 					} catch (IOException e) {
+						
+						// Kill the server when closing connection fails
 						throw new Exception("Something went wrong while closing the connection. " + e.getMessage());
 					}
 				}
