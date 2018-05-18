@@ -3,6 +3,7 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketOptions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -141,6 +142,10 @@ public class SinglePlayerServer {
 			do {
 				
 				Socket socket = serverSocket.accept();
+				
+				// keep alive
+				socket.setKeepAlive(true);
+				
 				serverCallback.onClientConnected(singlePlayerServer, socket);
 				
 				// launch the game handler

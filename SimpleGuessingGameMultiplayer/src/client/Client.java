@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -49,7 +50,9 @@ public class Client {
 		try {
 			
 			// By default this connects to 127.0.0.1:15376
-			socket = new Socket(host, port);
+			socket = new Socket();
+			socket.connect(new InetSocketAddress(host, port), 60 * 1000);
+			socket.setSoTimeout(60 * 1000);
 			System.out.println("Connected to " + host + " on port " + port);
 			
 			// client will receive an instance of server.Response object in serialized form

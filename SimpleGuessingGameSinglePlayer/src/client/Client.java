@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import server.Response;
@@ -49,7 +51,10 @@ public class Client {
 		try {
 			
 			// By default this connects to 127.0.0.1:15376
-			socket = new Socket(host, port);
+			socket = new Socket();
+			socket.connect(new InetSocketAddress(host, port), 60 * 1000);
+			socket.setSoTimeout(60 * 1000);
+			
 			System.out.println("Connected to " + host + " on port " + port);
 			
 			// client will receive an instance of server.Response object in serialized form
@@ -90,6 +95,10 @@ public class Client {
 		// Server not started or you are not connected
 		catch (UnknownHostException e) {
 			System.err.printf("Server %s:%d cannot be found\n", host, port);
+		}
+		// Client reached timeout
+		catch (SocketTimeoutException e) {
+			System.err.println("Client reached timeout.");
 		}
 		// Something cuts the connection
 		catch (EOFException e) {

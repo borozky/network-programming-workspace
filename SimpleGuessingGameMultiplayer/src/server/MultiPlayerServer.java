@@ -149,6 +149,10 @@ public class MultiPlayerServer {
 			do {
 				// listen for new connections
 				Socket socket = serverSocket.accept();
+				
+				// keep alive
+				socket.setKeepAlive(true);
+				
 				serverCallback.onClientConnected(multiPlayerServer, socket);
 				
 				// process the game in a new thread per client connected
