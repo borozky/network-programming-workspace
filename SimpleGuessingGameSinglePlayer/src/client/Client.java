@@ -11,12 +11,31 @@ import java.net.UnknownHostException;
 
 import server.Response;
 
+/**
+ * Class the represent the player's client machine. This client expects to receive serialized form of server.Response object. 
+ * <p>Note: You must compile the whole project and not only this file.
+ * <p>After the client deserialized the payload, it can do one of these 3 commands:<ul>
+ * <li>PRINTMESSAGE - Tells the client to print message to the screen</li>
+ * <li>READLINE -  Read inputs from the console and send the contents via output stream.</li>
+ * <li>QUIT - Tells the client to quit the program</li></ul>
+ * 
+ * @author user
+ *
+ */
 public class Client {
 	
-	public static final int DEFAULT_SERVER_PORT = 15376;
+	// Loopback address. You can customize the host by 
+	// specifying the host as the first argument in main(String[] args)
 	public static final String DEFAULT_SERVER_HOST = "127.0.0.1";
 	
+	// Default port. You can use a custom port by 
+	// passing the second argument into the main(String[] args)
+	public static final int DEFAULT_SERVER_PORT = 15376;
+	
 
+	// You can pass 2 arguments, 
+	// - the first one is the host name
+	// - the second is the port number to listen from
 	public static void main(String[] args) {
 		
 		int port = getPortNumber(args);
@@ -33,7 +52,10 @@ public class Client {
 			socket = new Socket(host, port);
 			System.out.println("Connected to " + host + " on port " + port);
 			
+			// client will receive an instance of server.Response object in serialized form
 			objectInputStream = new ObjectInputStream(socket.getInputStream());
+			
+			// this client will send normal sequence of characters to the server
 			writer = new PrintWriter(socket.getOutputStream(), true);
 			console = new BufferedReader(new InputStreamReader(System.in));
 			
@@ -43,32 +65,42 @@ public class Client {
 			do {
 				command = (Response) objectInputStream.readObject();
 				
-				
+				// print response's message and read input from console
 				if (command.getType() == Response.READLINE) {
 					System.out.print(command.getMessage());
 					line = console.readLine();
 					writer.println(line);
 				}
+				
+				// Print messages as usual
 				else {
 					System.out.println(command.getMessage());
 				}
 			}
+			
+			// server may send a QUIT command. If that's the case, then exit the loop
 			while(command.getType() != Response.QUIT);
 			
 		}
+		// Most likely will throw this exception in case you only compiled this file
+		// Remember, compile the whole project
 		catch (ClassNotFoundException e) {
 			System.err.println("The command data sent by the server cannot be read by this client. " + e.getMessage());
 		}
+		// Server not started or you are not connected
 		catch (UnknownHostException e) {
 			System.err.printf("Server %s:%d cannot be found\n", host, port);
 		}
+		// Something cuts the connection
 		catch (EOFException e) {
 			System.err.print("Client disconnected. ");
 		} 
+		// Other exceptions
 		catch (IOException e) {
 			System.err.println("Sorry, something went wrong. " + e.getMessage());
 		}
 		finally {
+			// Close and display a message
 			try {
 				if (console != null) console.close();
 				if (writer != null) writer.close();
@@ -76,7 +108,6 @@ public class Client {
 				if (socket != null) socket.close();
 				
 				System.out.println("Connection closed.");
-				
 			}
 			catch (IOException e) {
 				System.err.println("Sorry, something went wrong while closing the connection. " + e.getMessage());

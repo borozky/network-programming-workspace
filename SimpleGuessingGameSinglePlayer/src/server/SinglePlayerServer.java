@@ -12,13 +12,16 @@ import core.GameCallback;
 import core.GameCallbackLoggerImpl;
 
 /**
- * Controls the logic and server operation of the Simple Guessing game. The 
- * rules of the game is that the player has to guess a secret code in order 
- * to win. This game is played in rounds.  Player has to enter his/her name to 
- * join. The player is then asked for number of digits to generate the secret 
- * code. The randomly generated secret code will be 3-8 digits long and will 
- * have unique digits. Player has 10 attempts before they lose the round. 
- * After each round, you can choose to continue to the next round by sending a
+ * Controls the logic and server operation of the Simple Guessing game. 
+ * 
+ * <p>This server can accept 1 client at a time. The rules of the game is that the 
+ * player has to guess a secret code in order to win. This game is played in 
+ * rounds.  Player has to enter his/her name to join. The player is then asked 
+ * for number of digits to generate the secret code. The randomly generated 
+ * secret code will be 3-8 digits long and will have unique digits. Player has 
+ * 10 attempts before they lose the round. 
+ * 
+ * <p>After each round, you can choose to continue to the next round by sending a
  * 'p' or quit the game by sending 'q'. New secret codes will be created for 
  * each round.
  * 
@@ -56,9 +59,18 @@ public class SinglePlayerServer {
 		serverCallbacks.forEach(c -> c.onServerStarted(this, port));
 	}
 	
+	/**
+	 * Add new server callback
+	 * 
+	 * @param callback
+	 */
 	public void addServerCallback(ServerCallback callback) {
 		serverCallbacks.add(callback);
 	}
+	
+	
+	// GETTERS
+	
 	
 	public ServerSocket getServerSocket() {
 		return serverSocket;
@@ -76,6 +88,12 @@ public class SinglePlayerServer {
 		return serverCallbacks;
 	}
 	
+	
+	/**
+	 * Closes the ServerSocket
+	 * If closing the ServerSocket throws an Exception, 
+	 * it will call all serverCallbacks' onException() method
+	 */
 	public void close() {
 		try {
 			if (serverSocket != null) serverSocket.close();  
@@ -85,6 +103,11 @@ public class SinglePlayerServer {
 	}
 	
 	
+	/**
+	 * Program entry point
+	 * 
+	 * @param args You can pass a optional custom port number as the first parameter. Port defaults to 15376
+	 */
 	public static void main(String[] args) {
 		
 		// You can optionally pass the first argument as the port number
@@ -113,8 +136,8 @@ public class SinglePlayerServer {
 			singlePlayerServer.start();
 			
 			ServerSocket serverSocket = singlePlayerServer.getServerSocket();
-			game.start();
 			
+			// server's main loop, will accept new clients until the user kills the server
 			do {
 				
 				Socket socket = serverSocket.accept();
@@ -122,7 +145,7 @@ public class SinglePlayerServer {
 				
 				// launch the game handler
 				ServerProcess process = new ServerProcess(game, socket, serverCallback, gameCallbackLogger);
-				process.run();
+				process.begin();
 				
 			} while (true);
 			
@@ -153,6 +176,7 @@ public class SinglePlayerServer {
 		}
 		
 		try {
+			//throw exception if args[0] is not a number
 			portNumber = Integer.parseInt(args[0]);
 		}
 		catch (NumberFormatException numFormatEx) {

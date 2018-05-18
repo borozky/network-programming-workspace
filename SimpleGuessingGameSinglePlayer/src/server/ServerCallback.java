@@ -3,7 +3,8 @@ package server;
 import java.net.Socket;
 
 /**
- * List of server events
+ * Series of server events.
+ * These methods will be called by the SinglePlayerServer and ServerProcess classes
  * 
  * @author user
  *

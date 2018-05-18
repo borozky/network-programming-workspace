@@ -25,17 +25,22 @@ import core.GameManager;
  */
 public class ServerProcess {
 	
+	// Field that are required for the game to run
+	private Game game;
 	private Socket socket;
 	private ServerCallback cb;
+	
+	// derived fields
 	private ObjectOutputStream stream;
 	private BufferedReader reader;
-	private Game game;
 	private GameManager manager;
 	
 	public ServerProcess(Game game, Socket socket, ServerCallback callback, GameCallbackLoggerImpl gameLoggerCallback) throws IOException {
 		this.game = game;
 		this.socket = socket;
 		this.cb = callback;
+		
+		// we will serialize our response, so use ObjectOutputStream
 		this.stream = new ObjectOutputStream(socket.getOutputStream());
 		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.manager = new GameManager(game);
@@ -63,9 +68,17 @@ public class ServerProcess {
 	
 	
 	/**
-	 * Server process main loop
+	 * Server process main loop. This method will do these steps.<ol>
+	 * <li>Ask for player's name. This will happen only on the first time.</li>
+	 * <li>Ask for number of digits for the secret code if number. This will only happen once.</li>
+	 * <li>Starts the round</li>
+	 * <li>Ask the user to enter the guess. This part loops until player forfeits, wins or loses</li>
+	 * <li>Ends the round</li>
+	 * <li>Ask the player is they want to continue or quit. 
+	 * If the player decides to continue, the process repeats again (#3) or this process closes and return</li>
+	 * <ol>
 	 */
-	public void run() {
+	public void begin() {
 		
 		try {
 			
@@ -111,7 +124,7 @@ public class ServerProcess {
 			} else {
 				
 				// run this method again recursively
-				run();
+				begin();
 			}
 			
 		} catch (IOException e) {

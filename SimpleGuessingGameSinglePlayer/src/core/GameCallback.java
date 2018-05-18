@@ -1,5 +1,11 @@
 package core;
 
+/**
+ * Series of game events. 
+ * <p>Methods of this interface will be called in by the core.GameManager class
+ * 
+ * @author user
+ */
 public interface GameCallback {
 	
 	void onStart(Game game);
