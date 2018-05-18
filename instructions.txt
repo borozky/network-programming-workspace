@@ -1,0 +1,14 @@
+Program created by Joshua Orozco (s3485376@student.rmit.edu.au)
+
+HOW TO RUN THE SINGLEPLAYER GAME
+1. Using the terminal/command prompt, navigate to the root folder containing the Makefile.
+2. run "make singleplayer-server" to start the server
+3. Launch another terminal window and navigate to the same root folder
+4. run "make singleplayer-client"
+
+HOW TO RUN THE MULTIPLAYER GAME
+1. Using the terminal/command prompt, navigate to the root folder containing the Makefile.
+2. run "make multiplayer-server" to start the server
+3. Launch another terminal window and navigate to the same root folder
+4. run "make multiplayer-client"
+5. You can launch up to 6 clients.
