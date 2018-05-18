@@ -7,13 +7,27 @@ import java.util.List;
 
 import core.Player.PlayerStatus;
 
+/**
+ * Class that represents the game round. One game can have many rounds. 
+ * 
+ * @author user
+ *
+ */
 public class GameRound {
 	
 	public static final int MAX_ATTEMPTS = 10;
 	
+	/**
+	 * Store secret code here. Each round will have 1 unique secret code
+	 */
 	private String secretCode;
 	
+	
+	/**
+	 * For this round there will be multiple players
+	 */
 	List<Player> players = new ArrayList<>();
+	
 	List<Player> winners = new ArrayList<>();
 	List<Player> losers = new ArrayList<>();
 	List<Player> forfeited = new ArrayList<>();
@@ -27,31 +41,63 @@ public class GameRound {
 		this.secretCode = secretCode;
 	}
 	
+	/**
+	 * Adds the player to this round. 
+	 * If player has made guesses before, 
+	 * those guesses will be cleared automatically
+	 * 
+	 * @param player
+	 */
 	public void addPlayer(Player player) {
 		player.clearAllGuesses();
 		players.add(player);
 	}
 	
+	/**
+	 * Gets the secret code
+	 * 
+	 * @return
+	 */
 	public String getSecretCode() {
 		return secretCode;
 	}
 
 	
+	/**
+	 * Gets all the players in this round
+	 * @return
+	 */
 	public List<Player> getPlayers() {
 		return players;
 	}
 
 	
+	/**
+	 * Gets all the guesses made on this round
+	 * @return
+	 */
 	public List<String> getGuesses() {
 		return guesses;
 	}
 	
 	
+	/**
+	 * Gets the length of the secret code;
+	 * @return
+	 */
 	public int getNumDigits() {
 		return secretCode.trim().length();
 	}
 	
 	
+	/**
+	 * Adds guesses. By adding new guess, you can 
+	 * change the outcome of the players for this round
+	 * (eg. WINNING, LOSING, FORFEIT)
+	 * 
+	 * @param player
+	 * @param guess
+	 */
 	public void addGuess(Player player, String guess) {
 		// if player won, no need to add guess
 		if (hasWinner(player) || hasLoser(player)) {
@@ -80,6 +126,10 @@ public class GameRound {
 		}
 	}
 	
+	/**
+	 * Sets the player to be the one of the winners of this round
+	 * @param player
+	 */
 	public void addWinner(Player player) {
 		// add the player to the winners if
 		// - player is registered in this round
@@ -90,6 +140,10 @@ public class GameRound {
 		}
 	}
 	
+	/**
+	 * Sets the player to be one of the losers of this round
+	 * @param player
+	 */
 	public void addLoser(Player player) {
 		// add player to the losers if
 		// - player is registered in this round
@@ -100,21 +154,41 @@ public class GameRound {
 		}
 	}
 	
-	
+	/**
+	 * Check if the player is in the list of the winners for this round.
+	 * 
+	 * @param player
+	 * @return
+	 */
 	public boolean hasWinner(Player player) {
 		return winners.contains(player);
 	}
 	
 	
+	/**
+	 * Checks if player is in the list of the losers for this round.
+	 * @param player
+	 * @return
+	 */
 	public boolean hasLoser(Player player) {
 		return losers.contains(player);
 	}
 	
 	
+	/**
+	 * Checks if guess and secret code for this round is correct
+	 * @param guess
+	 * @return
+	 */
 	public boolean isGuessMatch(String guess) {
 		return secretCode.equals(guess);
 	}
 	
+	/**
+	 * Queries the list of players by name
+	 * @param playerName
+	 * @return
+	 */
 	public Player getPlayerByName(String playerName) {
 		for (Player player : players) {
 			if (player.getName().equals(playerName)) {
@@ -125,42 +199,74 @@ public class GameRound {
 		return null;
 	}
 	
+	
+	/**
+	 * Adds the player to the list of forfeiters for this round.
+	 * @param player
+	 */
 	private void addForfeiter(Player player) {
 		if (players.contains(player) && !losers.contains(player) && !winners.contains(player)) {
 			forfeited.add(player);
 		}
 	}
 	
+	
+	/**
+	 * Check if the player is in the list of players forfeited
+	 * @param player
+	 * @return
+	 */
 	public boolean hasForfeited(Player player) {
 		return forfeited.contains(player);
 	}
 	
+	/**
+	 * Forfeit this player in this round. 
+	 * Will add guesses to the player until the player has 11 guesses
+	 * @param player
+	 */
 	public void forfeit(Player player) {
 		for (int i = player.getNumGuesses(); i < MAX_ATTEMPTS + 1; i++) {
-			player.addGuess(null);
+			player.addGuess("");
 		}
 		addForfeiter(player);
 	}
 	
-	// this should be sorted
+	/**
+	 * Get all winners from this round
+	 * @return
+	 */
 	public synchronized List<Player> getWinners() {
 		return winners;
 	}
 	
+	/**
+	 * Get all losers from this round
+	 * @return
+	 */
 	public List<Player> getLosers() {
 		return losers;
 	}
 	
+	/**
+	 * Get all players forfeited from this round
+	 * @return
+	 */
 	public List<Player> getForfeiters() {
 		return forfeited;
 	}
 	
+	/**
+	 * Check if this round has ended
+	 * @return
+	 */
 	public boolean hasEnded() {
 		return hasEnded;
 	}
 	
-	// end the game
-	// all non-winnner players automatically lose the round
+	/**
+	 * End the game manually. All non-winner players will lose automatically.
+	 */
 	public void end() {
 		for(Player player : players) {
 			if (this.hasWinner(player) == false) {
@@ -169,9 +275,15 @@ public class GameRound {
 		}
 		
 		this.hasEnded = true;
-		//callbacks.forEach(c -> c.onRoundEnded(null, this));
 	}
 	
+	/**
+	 * Matches the guess to the set secret code. 
+	 * If a digits from guess is found in secret code and in the same position, the digit is in 'correct position'
+	 * 
+	 * @param guess
+	 * @return
+	 */
 	public int getNumCorrectPositions(String guess) {
 		int correctPositions = 0;
 		
@@ -193,6 +305,13 @@ public class GameRound {
 		return correctPositions;
 	}
 	
+	/**
+	 * Matches the guess to the set secret code. 
+	 * If a digit from guess is found in the secret code but not in correct position, the digit is in 'incorrect position'
+	 * 
+	 * @param guess
+	 * @return
+	 */
 	public int getNumIncorrectPositions(String guess) {
 		int incorrectPositions = 0;
 		

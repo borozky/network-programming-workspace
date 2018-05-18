@@ -101,7 +101,7 @@ public class GameRound {
 	
 	/**
 	 * Handles how guesses will be recorded. 
-	 * By adding new guess you can the state of the round (WINNING, LOSING, FORFEIT)
+	 * By adding new guess you can change the state of this round (WINNING, LOSING, FORFEIT)
 	 * 
 	 * @param player
 	 * @param guess

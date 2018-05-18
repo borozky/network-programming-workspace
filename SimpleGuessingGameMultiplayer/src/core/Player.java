@@ -5,6 +5,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Player entity. Client status will reflect into this class
+ * 
+ * @author user
+ *
+ */
 public class Player implements Comparable<Player> {
 	
 	public enum PlayerStatus {
@@ -27,6 +33,10 @@ public class Player implements Comparable<Player> {
 		this.name = name;
 	}
 	
+	/**
+	 * Empty player guesses. Guesses are usually emptied 
+	 * before each round starts, including the first round
+	 */
 	public void resetGuesses() {
 		guesses = new ArrayList<>();
 		lastGuess = null;
@@ -52,6 +62,12 @@ public class Player implements Comparable<Player> {
 		return lastGuess;
 	}
 	
+	/**
+	 * Add player guess. 
+	 * Every time you call this method, the last guess will be updated
+	 * 
+	 * @param guess
+	 */
 	public void addGuess(String guess) {
 		guesses.add(guess);
 		lastGuess = guess;
@@ -61,18 +77,37 @@ public class Player implements Comparable<Player> {
 		return guesses.size();
 	}
 	
+	/**
+	 * Removes all guesses
+	 */
 	public void clearAllGuesses() {
 		guesses.clear();
 	}
 	
+	/**
+	 * Convenience method to check if player has won in a given round
+	 * 
+	 * @param round
+	 * @return
+	 */
 	public boolean hasWon(GameRound round) {
 		return round.hasWinner(this);
 	}
 	
+	/**
+	 * Convenience method to check if player has lost in a given round
+	 * @param round
+	 * @return
+	 */
 	public boolean hasLost(GameRound round) {
 		return round.hasLoser(this);
 	}
 	
+	/**
+	 * Convenience method to check if player has forfeited the round.
+	 * @param round
+	 * @return
+	 */
 	public boolean hasForfeited(GameRound round) {
 		return round.hasForfeited(this);
 	}
