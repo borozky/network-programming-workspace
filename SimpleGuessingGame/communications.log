@@ -1,0 +1,132 @@
+May 08, 2018 5:25:32 PM server.singleplayer.ServerCallbackImpl log
+INFO: Server started on port 15376
+May 08, 2018 5:25:32 PM server.singleplayer.ServerCallbackImpl log
+INFO: Waiting for connections...
+May 08, 2018 5:25:45 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client 127.0.0.1 connected
+May 08, 2018 5:25:45 PM server.singleplayer.ServerCallbackImpl log
+INFO: Game started
+May 08, 2018 5:25:45 PM server.singleplayer.ServerCallbackImpl log
+INFO: Player name requested
+May 08, 2018 5:26:15 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: sometghin
+May 08, 2018 5:26:15 PM server.singleplayer.ServerCallbackImpl log
+INFO: Player sometghin received
+
+May 08, 2018 5:26:17 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 9
+May 08, 2018 5:26:20 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 100
+May 08, 2018 5:26:21 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 
+May 08, 2018 5:26:57 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 1234567
+May 08, 2018 5:27:02 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 12345678
+May 08, 2018 5:27:04 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 345436456
+May 08, 2018 5:27:05 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 5656757
+May 08, 2018 5:27:06 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 67678
+May 08, 2018 5:27:06 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 67
+May 08, 2018 5:27:06 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 867
+May 08, 2018 5:27:07 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 86786
+May 08, 2018 5:27:07 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 7887
+May 08, 2018 5:27:08 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: 
+May 08, 2018 5:27:15 PM server.singleplayer.ServerCallbackImpl log
+INFO: Client replied: n
+May 08, 2018 5:27:15 PM server.singleplayer.ServerCallbackImpl log
+INFO: Player 'sometghin' has decided to quit
+May 08, 2018 5:27:15 PM server.singleplayer.ServerCallbackImpl log
+INFO: Waiting for connections...
+May 08, 2018 5:52:23 PM server.singleplayer.ServerCallbackImpl log
+INFO: SERVER STARTED: Server started on port 15376
+May 08, 2018 5:52:24 PM server.singleplayer.ServerCallbackImpl log
+INFO: WAITING FOR CONNECTIONS...
+May 08, 2018 5:52:52 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT CONNECTED: Client 127.0.0.1 connected
+May 08, 2018 5:52:52 PM server.singleplayer.ServerCallbackImpl log
+INFO: GAME STARTED
+May 08, 2018 5:52:52 PM server.singleplayer.ServerCallbackImpl log
+INFO: PLAYER NAME REQUESTED
+May 08, 2018 5:53:23 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: joshua
+May 08, 2018 5:53:23 PM server.singleplayer.ServerCallbackImpl log
+INFO: PLAYER NAME RECEIVED: joshua
+
+May 08, 2018 5:53:29 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: 
+May 08, 2018 5:53:29 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: ROUND STARTED
+May 08, 2018 5:53:38 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: 214234
+May 08, 2018 5:53:38 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: PLAYER GUESSED: Player 'joshua' guessed 214234
+May 08, 2018 5:53:38 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: INCORRECT GUESS: Player 'joshua' made incorrect guess (1 correct, 4 incorrect).
+May 08, 2018 5:53:38 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: 324
+May 08, 2018 5:53:38 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: PLAYER GUESSED: Player 'joshua' guessed 324
+May 08, 2018 5:53:38 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: INCORRECT GUESS: Player 'joshua' made incorrect guess (2 correct, 0 incorrect).
+May 08, 2018 5:53:39 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: 234243
+May 08, 2018 5:53:39 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: PLAYER GUESSED: Player 'joshua' guessed 234243
+May 08, 2018 5:53:39 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: INCORRECT GUESS: Player 'joshua' made incorrect guess (1 correct, 3 incorrect).
+May 08, 2018 5:53:40 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: 23443
+May 08, 2018 5:53:40 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: PLAYER GUESSED: Player 'joshua' guessed 23443
+May 08, 2018 5:53:40 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: INCORRECT GUESS: Player 'joshua' made incorrect guess (1 correct, 2 incorrect).
+May 08, 2018 5:53:45 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: 345354
+May 08, 2018 5:53:45 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: PLAYER GUESSED: Player 'joshua' guessed 345354
+May 08, 2018 5:53:45 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: INCORRECT GUESS: Player 'joshua' made incorrect guess (0 correct, 2 incorrect).
+May 08, 2018 5:53:45 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: 345
+May 08, 2018 5:53:45 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: PLAYER GUESSED: Player 'joshua' guessed 345
+May 08, 2018 5:53:45 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: INCORRECT GUESS: Player 'joshua' made incorrect guess (0 correct, 1 incorrect).
+May 08, 2018 5:53:46 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: 354
+May 08, 2018 5:53:46 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: PLAYER GUESSED: Player 'joshua' guessed 354
+May 08, 2018 5:53:46 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: INCORRECT GUESS: Player 'joshua' made incorrect guess (1 correct, 0 incorrect).
+May 08, 2018 5:53:46 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: 345
+May 08, 2018 5:53:46 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: PLAYER GUESSED: Player 'joshua' guessed 345
+May 08, 2018 5:53:46 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: INCORRECT GUESS: Player 'joshua' made incorrect guess (0 correct, 1 incorrect).
+May 08, 2018 5:53:46 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: 354
+May 08, 2018 5:53:46 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: PLAYER GUESSED: Player 'joshua' guessed 354
+May 08, 2018 5:53:46 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: INCORRECT GUESS: Player 'joshua' made incorrect guess (1 correct, 0 incorrect).
+May 08, 2018 5:53:47 PM server.singleplayer.ServerCallbackImpl log
+INFO: CLIENT REPLIED: 
+May 08, 2018 5:53:47 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: PLAYER GUESSED: Player 'joshua' guessed 
+May 08, 2018 5:53:47 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: INCORRECT GUESS: Player 'joshua' made incorrect guess (0 correct, 0 incorrect).
+May 08, 2018 5:53:47 PM server.singleplayer.GameRoundCallbackImpl log
+INFO: PLAYER LOST: Player 'joshua' lost the round. The secret code was '724169'
+May 08, 2018 6:01:27 PM server.singleplayer.ServerCallbackImpl log
+INFO: SERVER STARTED: Server started on port 15376
+May 08, 2018 6:01:27 PM server.singleplayer.ServerCallbackImpl log
+INFO: WAITING FOR CONNECTIONS...
