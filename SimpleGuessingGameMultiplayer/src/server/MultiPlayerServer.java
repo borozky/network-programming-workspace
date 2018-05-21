@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -145,6 +147,34 @@ public class MultiPlayerServer {
 			multiPlayerServer.start();
 			ServerSocket serverSocket = multiPlayerServer.getServerSocket();
 			game.start();
+
+			// close the server using 'x'
+			Thread background = new Thread(() -> {
+				Scanner scanner = new Scanner(System.in);
+				String line = "";
+				System.out.println("Press 'x' to exit the server.");
+				do {
+					line = scanner.nextLine();
+				} while (!line.equals("x"));
+				
+				try {
+					for (ServerProcess process : processes.values()) {
+						try {
+							Socket socket = process.getSocket();
+							socket.close();
+							serverCallback.onClientDisconnected(multiPlayerServer, socket, process);
+						} catch (IOException e) {
+							serverCallback.onException(process, e);
+						}
+					}
+					serverSocket.close();
+				} catch (IOException e) {
+					serverCallback.onException(null, e);
+				}
+				scanner.close();
+			});
+			background.start();
+			
 			
 			do {
 				// listen for new connections
@@ -162,8 +192,13 @@ public class MultiPlayerServer {
 				
 				// save this process for future reference
 				processes.put(socket, process);
+
 			} 
 			while (true);
+		}
+		// server operator closed the server
+		catch (SocketException e) {
+			System.out.println("Server closed.");
 		}
 		// when something wrong happens, trigger an onException() event
 		catch (IOException e) {
